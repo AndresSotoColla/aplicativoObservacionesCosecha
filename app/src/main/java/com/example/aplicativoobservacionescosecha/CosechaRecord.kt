@@ -20,5 +20,6 @@ data class CosechaRecord(
     val ausente: Int = 0,
     val bajoPeso: Int = 0,
     val golpeAgua: Int = 0,
-    val observaciones: String = ""
+    val observaciones: String = "",
+    var isSynced: Boolean = false
 )

@@ -27,6 +27,11 @@ object StorageManager {
         val type = object : TypeToken<List<CosechaRecord>>() {}.type
         return gson.fromJson(json, type) ?: emptyList()
     }
+
+    fun saveAllRecords(context: Context, records: List<CosechaRecord>) {
+        val prefs = context.getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE)
+        prefs.edit().putString(KEY_RECORDS, gson.toJson(records)).apply()
+    }
     
     fun deleteRecord(context: Context, id: String) {
         val prefs = context.getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE)

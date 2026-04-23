@@ -87,7 +87,17 @@ fun MainMenu(
 
         Spacer(modifier = Modifier.weight(1f))
 
+        val coroutineScope = rememberCoroutineScope()
+
         MenuButton(text = "Ingresar Registro", icon = Icons.Default.AddCircle, onClick = onRegistroClick)
+        Spacer(modifier = Modifier.height(16.dp))
+        MenuButton(text = "Subir Datos (Sincronizar)", icon = Icons.Default.CloudUpload, onClick = {
+            coroutineScope.launch {
+                SyncManager.syncData(context) { msg ->
+                    android.widget.Toast.makeText(context, msg, android.widget.Toast.LENGTH_LONG).show()
+                }
+            }
+        })
         Spacer(modifier = Modifier.height(16.dp))
         MenuButton(text = "Historial", icon = Icons.Default.History, onClick = onHistorialClick)
         Spacer(modifier = Modifier.height(16.dp))
@@ -394,6 +404,13 @@ fun HistorialScreen(onBack: () -> Unit) {
                             Text("Total Dejada/Descarte: ${record.frutaDejada + record.descarteCamas}", fontSize = 14.sp, color = Color.Gray)
                             Text("Observaciones: ${record.observaciones.ifEmpty { "N/A" }}", fontSize = 14.sp, color = Color.Gray, maxLines = 1)
                             
+                            Spacer(modifier = Modifier.height(4.dp))
+                            if (record.isSynced) {
+                                Text("✅ Sincronizado a Nube", fontSize = 14.sp, color = Color(0xFF4CAF50), fontWeight = FontWeight.Bold)
+                            } else {
+                                Text("⏳ Pendiente por Sincronizar", fontSize = 14.sp, color = Color(0xFFFF9800), fontWeight = FontWeight.Bold)
+                            }
+
                             Spacer(modifier = Modifier.height(12.dp))
                             OutlinedButton(
                                 onClick = {
