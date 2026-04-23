@@ -17,8 +17,12 @@ object SyncManager {
     private val gson = Gson()
     private val url = "https://interno.control.agricolaguapa.com/consultor/api/cargue_json_verificacion_cosecha"
 
-    suspend fun syncData(context: Context, onResult: (String) -> Unit) {
-        val records = StorageManager.getRecords(context).filter { !it.isSynced }
+    suspend fun syncData(context: Context, idFilter: String? = null, onResult: (String) -> Unit) {
+        var records = StorageManager.getRecords(context).filter { !it.isSynced }
+        
+        if (idFilter != null) {
+            records = records.filter { it.id == idFilter }
+        }
         
         if (records.isEmpty()) {
             withContext(Dispatchers.Main) {

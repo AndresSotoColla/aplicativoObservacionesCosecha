@@ -89,17 +89,7 @@ fun MainMenu(
 
         Spacer(modifier = Modifier.weight(1f))
 
-        val coroutineScope = rememberCoroutineScope()
-
         MenuButton(text = "Ingresar Registro", icon = Icons.Default.AddCircle, onClick = onRegistroClick)
-        Spacer(modifier = Modifier.height(16.dp))
-        MenuButton(text = "Subir Datos (Sincronizar)", icon = Icons.Default.CloudUpload, onClick = {
-            coroutineScope.launch {
-                SyncManager.syncData(context) { msg ->
-                    android.widget.Toast.makeText(context, msg, android.widget.Toast.LENGTH_LONG).show()
-                }
-            }
-        })
         Spacer(modifier = Modifier.height(16.dp))
         MenuButton(text = "Historial", icon = Icons.Default.History, onClick = onHistorialClick)
         Spacer(modifier = Modifier.height(16.dp))
@@ -360,6 +350,7 @@ fun HistorialScreen(onBack: () -> Unit) {
     val context = LocalContext.current
     var records by remember { mutableStateOf(StorageManager.getRecords(context)) }
     val dateFormat = remember { SimpleDateFormat("dd/MM/yyyy HH:mm", Locale.getDefault()) }
+    val coroutineScope = rememberCoroutineScope()
 
     Column(modifier = Modifier.fillMaxSize()) {
         Box(
@@ -386,6 +377,23 @@ fun HistorialScreen(onBack: () -> Unit) {
                 Text("No hay registros", fontSize = 18.sp, color = Color.Gray)
             }
         } else {
+            Button(
+                onClick = {
+                    coroutineScope.launch {
+                        SyncManager.syncData(context) { msg ->
+                            android.widget.Toast.makeText(context, msg, android.widget.Toast.LENGTH_LONG).show()
+                            records = StorageManager.getRecords(context)
+                        }
+                    }
+                },
+                modifier = Modifier.fillMaxWidth().padding(horizontal = 16.dp, vertical = 8.dp).height(50.dp),
+                colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF4CAF50), contentColor = Color.White)
+            ) {
+                Icon(Icons.Default.CloudUpload, contentDescription = null)
+                Spacer(modifier = Modifier.width(8.dp))
+                Text("Subir Todos los Pendientes", fontWeight = FontWeight.Bold)
+            }
+
             LazyColumn(
                 modifier = Modifier
                     .fillMaxSize()
@@ -411,6 +419,23 @@ fun HistorialScreen(onBack: () -> Unit) {
                                 Text("✅ Sincronizado a Nube", fontSize = 14.sp, color = Color(0xFF4CAF50), fontWeight = FontWeight.Bold)
                             } else {
                                 Text("⏳ Pendiente por Sincronizar", fontSize = 14.sp, color = Color(0xFFFF9800), fontWeight = FontWeight.Bold)
+                                Spacer(modifier = Modifier.height(4.dp))
+                                Button(
+                                    onClick = {
+                                        coroutineScope.launch {
+                                            SyncManager.syncData(context, record.id) { msg ->
+                                                android.widget.Toast.makeText(context, msg, android.widget.Toast.LENGTH_LONG).show()
+                                                records = StorageManager.getRecords(context)
+                                            }
+                                        }
+                                    },
+                                    modifier = Modifier.fillMaxWidth().height(40.dp),
+                                    colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF2196F3), contentColor = Color.White)
+                                ) {
+                                    Icon(Icons.Default.CloudUpload, contentDescription = null, modifier = Modifier.size(20.dp))
+                                    Spacer(modifier = Modifier.width(8.dp))
+                                    Text("Subir Registro")
+                                }
                             }
 
                             Spacer(modifier = Modifier.height(12.dp))
