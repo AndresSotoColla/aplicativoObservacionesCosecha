@@ -64,6 +64,8 @@ fun MainMenu(
     onHistorialClick: () -> Unit,
     onDescargarExcelClick: () -> Unit
 ) {
+    val context = LocalContext.current
+    
     Column(
         modifier = Modifier
             .fillMaxSize()
